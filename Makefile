@@ -1,7 +1,7 @@
 service=release_workflows
 
 build:
-	docker build -t local/$(service):production --label=$(git rev-parse --short HEAD) .
+	docker build -t local/$(service):production --label=$(shell git rev-parse --short HEAD) .
 
 tag-version:
 	docker tag local/$(service):production ${DOCKER_REGISTRY}/$(service):${DOCKER_IMAGE_TAG}
