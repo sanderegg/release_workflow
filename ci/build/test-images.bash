@@ -23,14 +23,7 @@ pull_images() {
 }
 
 build_images() {
-    if [[ -v DOCKER_BUILDX ]]; then
-        make build-cache-x
-        make build-x
-    else
-        make build-cache
-        make build
-    fi    
-    make info-images
+    make build
 }
 
 # Check if the function exists (bash specific)
