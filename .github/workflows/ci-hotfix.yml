@@ -1,4 +1,4 @@
-name: Github-CI-Release
+name: Github-CI-Hotfix-Release
 
 on:
   push:
