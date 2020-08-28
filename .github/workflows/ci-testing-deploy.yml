@@ -65,27 +65,7 @@ jobs:
   deploy:
     name: deploy to dockerhub
     if: github.event_name == 'push'
-    needs:
-      [
-        unit-test-api,
-        unit-test-catalog,
-        unit-test-director,
-        unit-test-sidecar,
-        unit-test-frontend,
-        unit-test-python-linting,
-        unit-test-service-library,
-        unit-test-simcore-sdk,
-        unit-test-storage,
-        unit-test-webserver-isolated,
-        unit-test-webserver-slow,
-        unit-test-webserver-medium,
-        unit-test-webserver-fast,
-        integration-test-webserver,
-        integration-test-sidecar,
-        integration-test-simcore-sdk,
-        system-test-swarm-deploy,
-        system-test-e2e,
-      ]
+    needs: [build-test-images]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
