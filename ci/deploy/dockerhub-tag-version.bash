@@ -35,7 +35,7 @@ log_msg "finding the version in the docker hub registry..."
 # find and pull the tagged build
 # find the docker image tag
 export ORG=${DOCKER_REGISTRY}
-export REPO="webserver"
+export REPO="release_workflows"
 # FROM_TAG_PREFIX-DATE.GIT_SHA
 export TAG_PATTERN="^${FROM_TAG_PREFIX}-.+\..+"
 DOCKER_IMAGE_TAG=$(./ci/helpers/find_docker_image_tag_from_git_sha.bash | awk 'END{print}') || exit $?
