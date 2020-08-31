@@ -23,15 +23,19 @@ jobs:
       TO_TAG_PREFIX: release-github
     steps:
       - uses: actions/checkout@v2
-      - name: setup docker
+      - if: contains(github.ref, 'refs/heads/hotfix_v')
+        name: setup docker
         run: |
           sudo ./ci/github/helpers/setup_docker_compose.bash
           ./ci/github/helpers/setup_docker_experimental.bash
           ./ci/github/helpers/setup_docker_buildx.bash
           echo ::set-env name=DOCKER_BUILDX::1
       - name: set owner variable
+        if: contains(github.ref, 'refs/heads/hotfix_v')
         run: echo ::set-env name=OWNER::${GITHUB_REPOSITORY%/*}
       - name: set git tag
+        if: contains(github.ref, 'refs/heads/hotfix_v')
         run: echo ::set-env name=GIT_TAG::${GITHUB_REF##*/}
       - name: deploy
+        if: contains(github.ref, 'refs/heads/hotfix_v')
         run: ./ci/deploy/dockerhub-tag-version.bash
