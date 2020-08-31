@@ -20,22 +20,25 @@ push-cache:
 
 info-images:
 	# I don't care
-guard-%:
+.guard-%:
 	@if [ "${${*}}" = "" ]; then \
 		echo -e "\e[91mEnvironment variable $* not set" 1>&2; exit 1;\
 	fi
 
-.PHONY: staging-release
-git_sha?=HEAD
-staging-release: guard-name guard-version ## prepare github URL for staging version `make staging-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
-	@if [ "$(shell git rev-parse --abbrev-ref HEAD)" != "master" ]; then\
-		echo -e "\e[91mcurrent branch is not master branch, staging forbidden."; exit 1;\
-	else\
-		echo "master branch detected, preparing for staging...";\
+staging_prefix := staging_
+git_sha ?= HEAD
+_git_get_current_branch = $(shell git rev-parse --abbrev-ref HEAD)
+_git_get_latest_staging_tags = $(shell git describe --match="$(staging_prefix)*" --abbrev=0 --tags)
+_git_get_pretty_logs = $(shell git log $(_git_get_latest_staging_tags)..$(_git_sha) --pretty="format:- %s")
+_url_encode = $(shell scripts/url-encoder.bash "$(_git_get_pretty_logs)")
+_git_get_repo_name = $(shell basename `git rev-parse --show-toplevel`)
+.PHONY: .check-master-branch
+.check-master-branch:
+	@if [ "$(_git_get_current_branch)" != "master" ]; then\
+		echo -e "\e[91mcurrent branch is not master branch."; exit 1;\
 	fi
-	@latest_tag=$(shell git describe --match="staging_*" --abbrev=0 --tags); \
-	echo "getting logs between $$latest_tag and $(git_sha)"; \
-	logs=$$(git log $$latest_tag..$(git_sha) --pretty="format:- %s");\
-	body=$$(scripts/url-encoder.bash $$logs);\
-	echo -e "Open the following link to create the staging release:";\
-	echo -e "\e[32mhttps://github.com/itisfoundation/osparc-simcore/releases/new?prerelease=1&target=$${git_sha}&tag=staging_$${name}$${version}&title=Staging%20$${name}$${version}&body=$${body}"
+
+.PHONY: staging-release
+staging-release: .check-master-branch .guard-name .guard-version ## prepare github URL for staging version `make staging-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
+	@echo "\e[33mOpen the following link to create the staging release:";
+	@echo "\e[32mhttps://github.com/itisfoundation/$(_git_get_repo_name)/releases/new?prerelease=1&target=$(git_sha)&tag=staging_$(name)$(version)&title=Staging%20$(name)$(version)&body=$(_url_encode)";
