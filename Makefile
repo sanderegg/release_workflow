@@ -34,5 +34,8 @@ staging-release: guard-name guard-version ## prepare github URL for staging vers
 		echo "master branch detected, preparing for staging...";\
 	fi
 	@latest_tag=$(shell git describe --match="staging_*" --abbrev=0 --tags); \
-	echo "getting logs between $$latest_tag and $$git_sha"; \
-	logs=$(shell git log $$latest_tag..$(git_sha));
+	echo "getting logs between $$latest_tag and $(git_sha)"; \
+	logs=$$(git log $$latest_tag..$(git_sha) --pretty="format:- %s");\
+	body=$$(scripts/url-encoder.bash $$logs);\
+	echo -e "Open the following link to create the staging release:";\
+	echo -e "\e[32mhttps://github.com/itisfoundation/osparc-simcore/releases/new?prerelease=1&target=$${git_sha}&tag=staging_$${name}$${version}&title=Staging%20$${name}$${version}&body=$${body}"
