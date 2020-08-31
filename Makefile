@@ -31,11 +31,15 @@ git_sha ?= HEAD
 _git_get_current_branch = $(shell git rev-parse --abbrev-ref HEAD)
 _git_get_latest_staging_tags = $(shell git describe --match="$(staging_prefix)*" --abbrev=0 --tags)
 _git_get_latest_release_tags = $(shell git describe --match="$(release_prefix)*" --abbrev=0 --tags)
-_git_get_staging_pretty_logs = $(shell git log $(_git_get_latest_staging_tags)..$(git_sha) --pretty=format:"- %s")
-_git_get_release_pretty_logs = $(shell git log $(_git_get_latest_release_tags)..$(git_sha) --pretty=format:"- %s")
-_url_encode_staging_logs = $(shell scripts/url-encoder.bash "$(_git_get_staging_pretty_logs)")
-_url_encode_release_logs = $(shell scripts/url-encoder.bash "$(_git_get_release_pretty_logs)")
+# NOTE: be careful that GNU Make replaces newlines with space which is why this command cannot work using a Make function
+_url_encode_staging_logs = $(shell scripts/url-encoder.bash \
+							"$$(git log $(_git_get_latest_staging_tags)..$(git_sha) --pretty=format:"- %s")"\
+							)
+_url_encode_release_logs = $(shell scripts/url-encoder.bash \
+							"$$(git log $(_git_get_latest_release_tags)..$(git_sha) --pretty=format:"- %s")"\
+							)
 _git_get_repo_orga_name = $(shell git config --get remote.origin.url | grep --perl-regexp --only-matching "((?<=git@github\.com:)|(?<=https:\/\/github\.com\/))(.*?)(?=.git)")
+
 .PHONY: .check-master-branch
 .check-master-branch:
 	@if [ "$(_git_get_current_branch)" != "master" ]; then\
@@ -51,3 +55,4 @@ staging-release: .check-master-branch .guard-name .guard-version ## prepare gith
 github-release: .check-master-branch .guard-version ## prepare github URL for releasing version `make github-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
 	@echo "\e[33mOpen the following link to create the release:";
 	@echo -e "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=0&target=$(git_sha)&tag=$(release_prefix)$(version)&title=Release%20$(version)&body=$(_url_encode_release_logs)";
+
