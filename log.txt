@@ -1,0 +1,9 @@
+b46a53a5 (HEAD -> master, origin/master, origin/HEAD) more file
+b8ae2a7a add some file
+b1336be2 add newlines
+6e82b1f8 (tag: v_1.0.0, tag: staging_mySprint6) adding release recipe
+567b0866 (tag: staging_mySprint5, tag: staging_mySprint3) fix regexp
+10db72fd make recipe almost ready
+53e17134 getting near to a usable makefile recipe
+c68c1b06 added url encoder script
+76d37f83 adding makefile recipe for staging
