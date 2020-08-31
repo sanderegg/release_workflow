@@ -21,6 +21,8 @@ jobs:
       TO_TAG_PREFIX: release-github
     steps:
       - uses: actions/checkout@v2
+      - name: show env
+        run: env
       - name: setup docker
         run: |
           sudo ./ci/github/helpers/setup_docker_compose.bash
