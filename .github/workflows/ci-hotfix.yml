@@ -13,6 +13,7 @@ env:
 
 jobs:
   deploy:
+    if: contains(github.event.base_ref, 'refs/heads/hotfix_v')
     # only run on staging branch
     name: deploy release
     runs-on: ubuntu-latest
