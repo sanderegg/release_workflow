@@ -59,5 +59,7 @@ _git_get_repo_orga_name = $(shell git config --get remote.origin.url | \
 
 .PHONY: release-staging release-prod
 release-staging release-prod: .check-master-branch
+	# ensure tags are uptodate
+	@git pull --tags
 	@echo "\e[33mOpen the following link to create the $(if $(findstring -staging, $@),staging,production) release:";
 	@echo "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=$(if $(findstring -staging, $@),1,0)&target=$(_url_encoded_target)&tag=$(_url_encoded_tag)&title=$(_url_encoded_title)&body=$(_url_encoded_logs)";
