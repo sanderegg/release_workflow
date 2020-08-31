@@ -26,19 +26,30 @@ info-images:
 	fi
 
 staging_prefix := staging_
-release_prefix := v
+prod_prefix := v
 git_sha ?= HEAD
 _git_get_current_branch = $(shell git rev-parse --abbrev-ref HEAD)
-_git_get_latest_staging_tags = $(shell git describe --match="$(staging_prefix)*" --abbrev=0 --tags)
-_git_get_latest_release_tags = $(shell git describe --match="$(release_prefix)*" --abbrev=0 --tags)
 # NOTE: be careful that GNU Make replaces newlines with space which is why this command cannot work using a Make function
-_url_encode_staging_logs = $(shell scripts/url-encoder.bash \
-							"$$(git log $(_git_get_latest_staging_tags)..$(git_sha) --pretty=format:"- %s")"\
-							)
-_url_encode_release_logs = $(shell scripts/url-encoder.bash \
-							"$$(git log $(_git_get_latest_release_tags)..$(git_sha) --pretty=format:"- %s")"\
-							)
-_git_get_repo_orga_name = $(shell git config --get remote.origin.url | grep --perl-regexp --only-matching "((?<=git@github\.com:)|(?<=https:\/\/github\.com\/))(.*?)(?=.git)")
+_url_encoded_title = $(if $(findstring -staging, $@),Staging%20$(name),)$(version)
+_url_encoded_tag = $(if $(findstring -staging, $@),$(staging_prefix)$(name),$(prod_prefix))$(version)
+define _url_encoded_logs
+$(shell \
+	scripts/url-encoder.bash \
+	"$$(git log \
+		$$(git describe --match="$(if $(findstring -staging, $@),$(staging_prefix),$(prod_prefix))*" --abbrev=0 --tags)..$(git_sha) \
+		--pretty=format:"- %s")"\
+)
+endef
+define check_release_precond
+$(if $(findstring -staging, $@),\
+	if [ "${${name}}" = "" ]; then echo "\e[91mname of staging release is not set!"; exit 1; fi; \
+	if [ "${${version}}" = "" ]; then echo "\e[91mversion of staging release is not set!"; exit 1; fi \
+,\
+	if [ "${${version}}" = "" ]; then echo "\e[91mname of staging version is not set!"; exit 1; fi \
+)
+endef
+_git_get_repo_orga_name = $(shell git config --get remote.origin.url | \
+							grep --perl-regexp --only-matching "((?<=git@github\.com:)|(?<=https:\/\/github\.com\/))(.*?)(?=.git)")
 
 .PHONY: .check-master-branch
 .check-master-branch:
@@ -46,13 +57,7 @@ _git_get_repo_orga_name = $(shell git config --get remote.origin.url | grep --pe
 		echo -e "\e[91mcurrent branch is not master branch."; exit 1;\
 	fi
 
-.PHONY: staging-release
-staging-release: .check-master-branch .guard-name .guard-version ## prepare github URL for staging version `make staging-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
-	@echo "\e[33mOpen the following link to create the staging release:";
-	@echo "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=1&target=$(git_sha)&tag=$(staging_prefix)$(name)$(version)&title=Staging%20$(name)$(version)&body=$(_url_encode_staging_logs)";
-
-.PHONY: release
-github-release: .check-master-branch .guard-version ## prepare github URL for releasing version `make github-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
-	@echo "\e[33mOpen the following link to create the release:";
-	@echo "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=0&target=$(git_sha)&tag=$(release_prefix)$(version)&title=Release%20$(version)&body=$(_url_encode_release_logs)";
-
+.PHONY: release-staging release-prod
+release-staging release-prod: .check-master-branch
+	@echo "\e[33mOpen the following link to create the $(if $(findstring -staging, $@),staging,production) release:";
+	@echo "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=$(if $(findstring -staging, $@),1,0)&target=$(git_sha)&tag=$(_url_encoded_tag)&title=$(_url_encoded_title)&body=$(_url_encoded_logs)";
