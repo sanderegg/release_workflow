@@ -21,20 +21,18 @@ push-cache:
 info-images:
 	# I don't care
 guard-%:
-	@ if [ "${${*}}" = "" ]; then \
-			echo "Environment variable $* not set"; \
-			exit 1; \
+	@if [ "${${*}}" = "" ]; then \
+		echo -e "\e[91mEnvironment variable $* not set" 1>&2; exit 1;\
 	fi
 
 .PHONY: staging-release
+git_sha?=HEAD
 staging-release: guard-name guard-version ## prepare github URL for staging version `make staging-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
-# check we are on master
-	@if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]; then\
-		echo "this is not master branch, staging forbidden."; \
-		exit 1;\
+	@if [ "$(shell git rev-parse --abbrev-ref HEAD)" != "master" ]; then\
+		echo -e "\e[91mcurrent branch is not master branch, staging forbidden."; exit 1;\
+	else\
+		echo "master branch detected, preparing for staging...";\
 	fi
-ifeq ($(git_sha),)
-else
-	git_sha=HEAD
-endif
-	git log
+	@latest_tag=$(shell git describe --match="staging_*" --abbrev=0 --tags); \
+	echo "getting logs between $$latest_tag and $$git_sha"; \
+	logs=$(shell git log $$latest_tag..$(git_sha));
