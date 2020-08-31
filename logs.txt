@@ -1,0 +1,19 @@
+- removed html line break does not work
+- add line breaks
+- add more logs
+- no branches
+- invert conditions
+- prevent release workflow to run when not on a tag
+- prevent hotfix from running anywhere else than on hotfix branches
+- syntax
+- prevent release to run on hotfix prevent hotfix to run on release
+- newline still fails
+- more file
+- add some file
+- add newlines
+- adding release recipe
+- fix regexp
+- make recipe almost ready
+- getting near to a usable makefile recipe
+- added url encoder script
+- adding makefile recipe for staging
