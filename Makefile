@@ -20,3 +20,21 @@ push-cache:
 
 info-images:
 	# I don't care
+guard-%:
+	@ if [ "${${*}}" = "" ]; then \
+			echo "Environment variable $* not set"; \
+			exit 1; \
+	fi
+
+.PHONY: staging-release
+staging-release: guard-name guard-version ## prepare github URL for staging version `make staging-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
+# check we are on master
+	@if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]; then\
+		echo "this is not master branch, staging forbidden."; \
+		exit 1;\
+	fi
+ifeq ($(git_sha),)
+else
+	git_sha=HEAD
+endif
+	git log
