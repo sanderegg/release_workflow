@@ -31,7 +31,7 @@ _git_get_current_branch = $(shell git rev-parse --abbrev-ref HEAD)
 _git_get_latest_staging_tags = $(shell git describe --match="$(staging_prefix)*" --abbrev=0 --tags)
 _git_get_pretty_logs = $(shell git log $(_git_get_latest_staging_tags)..$(_git_sha) --pretty="format:- %s")
 _url_encode = $(shell scripts/url-encoder.bash "$(_git_get_pretty_logs)")
-_git_get_repo_name = $(shell basename `git rev-parse --show-toplevel`)
+_git_get_repo_orga_name = $(shell git config --get remote.origin.url | grep --perl-regexp --only-matching "((?<=git@github\.com:)|(?<=https:\/\/github\.com\/))(.*?)(?=.git)")
 .PHONY: .check-master-branch
 .check-master-branch:
 	@if [ "$(_git_get_current_branch)" != "master" ]; then\
@@ -41,4 +41,4 @@ _git_get_repo_name = $(shell basename `git rev-parse --show-toplevel`)
 .PHONY: staging-release
 staging-release: .check-master-branch .guard-name .guard-version ## prepare github URL for staging version `make staging-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
 	@echo "\e[33mOpen the following link to create the staging release:";
-	@echo "\e[32mhttps://github.com/itisfoundation/$(_git_get_repo_name)/releases/new?prerelease=1&target=$(git_sha)&tag=staging_$(name)$(version)&title=Staging%20$(name)$(version)&body=$(_url_encode)";
+	@echo "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=1&target=$(git_sha)&tag=staging_$(name)$(version)&title=Staging%20$(name)$(version)&body=$(_url_encode)";
