@@ -54,5 +54,5 @@ staging-release: .check-master-branch .guard-name .guard-version ## prepare gith
 .PHONY: release
 github-release: .check-master-branch .guard-version ## prepare github URL for releasing version `make github-release name=SPRINTNAME version=X (git_sha=OPTIONAL_SHA)
 	@echo "\e[33mOpen the following link to create the release:";
-	@echo -e "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=0&target=$(git_sha)&tag=$(release_prefix)$(version)&title=Release%20$(version)&body=$(_url_encode_release_logs)";
+	@echo "\e[32mhttps://github.com/$(_git_get_repo_orga_name)/releases/new?prerelease=0&target=$(git_sha)&tag=$(release_prefix)$(version)&title=Release%20$(version)&body=$(_url_encode_release_logs)";
 
