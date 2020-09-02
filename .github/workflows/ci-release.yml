@@ -13,7 +13,6 @@ env:
 
 jobs:
   deploy:
-    # if: github.event.base_ref == 'refs/heads/master'
     # only run on staging branch
     name: deploy release
     runs-on: ubuntu-latest
@@ -33,15 +32,19 @@ jobs:
       - if: env.TARGET == 'remotes/origin/master'
         name: say hi
         run: echo hi
-      - name: setup docker
+      - if: env.TARGET == 'remotes/origin/master'
+        name: setup docker
         run: |
           sudo ./ci/github/helpers/setup_docker_compose.bash
           ./ci/github/helpers/setup_docker_experimental.bash
           ./ci/github/helpers/setup_docker_buildx.bash
           echo ::set-env name=DOCKER_BUILDX::1
-      - name: set owner variable
+      - if: env.TARGET == 'remotes/origin/master'
+        name: set owner variable
         run: echo ::set-env name=OWNER::${GITHUB_REPOSITORY%/*}
-      - name: set git tag
+      - if: env.TARGET == 'remotes/origin/master'
+        name: set git tag
         run: echo ::set-env name=GIT_TAG::${GITHUB_REF##*/}
-      - name: deploy
+      - if: env.TARGET == 'remotes/origin/master'
+        name: deploy
         run: ./ci/deploy/dockerhub-tag-version.bash
