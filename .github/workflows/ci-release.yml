@@ -17,7 +17,6 @@ jobs:
     name: deploy release
     runs-on: ubuntu-latest
     env:
-      FROM_TAG_PREFIX: staging-github
       TO_TAG_PREFIX: release-github
     steps:
       - uses: actions/checkout@v2
@@ -29,22 +28,23 @@ jobs:
           echo ::set-env name=TARGET::${target}
       - name: show env
         run: env
-      - if: env.TARGET == 'remotes/origin/master'
-        name: say hi
-        run: echo hi
-      - if: env.TARGET == 'remotes/origin/master'
-        name: setup docker
+      - name: setup docker
         run: |
           sudo ./ci/github/helpers/setup_docker_compose.bash
           ./ci/github/helpers/setup_docker_experimental.bash
           ./ci/github/helpers/setup_docker_buildx.bash
           echo ::set-env name=DOCKER_BUILDX::1
-      - if: env.TARGET == 'remotes/origin/master'
-        name: set owner variable
+      - name: set owner variable
         run: echo ::set-env name=OWNER::${GITHUB_REPOSITORY%/*}
-      - if: env.TARGET == 'remotes/origin/master'
-        name: set git tag
+      - name: set git tag
         run: echo ::set-env name=GIT_TAG::${GITHUB_REF##*/}
       - if: env.TARGET == 'remotes/origin/master'
+        env:
+          FROM_TAG_PREFIX: staging-github
+        name: deploy
+        run: ./ci/deploy/dockerhub-tag-version.bash
+      - if: contains(env.TARGET, 'remotes/origin/hotfix_v')
+        env:
+          FROM_TAG_PREFIX: hotfix-github
         name: deploy
         run: ./ci/deploy/dockerhub-tag-version.bash
