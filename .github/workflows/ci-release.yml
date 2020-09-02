@@ -22,8 +22,15 @@ jobs:
       TO_TAG_PREFIX: release-github
     steps:
       - uses: actions/checkout@v2
+      - name: set target variable
+        run: |
+          target=$(git name-rev --refs="refs/heads/*" --name-only ${GITHUB_SHA})
+          echo ::set-env name=TARGET::${target}
       - name: show env
         run: env
+      - if: env.TARGET == master
+        name: say hi
+        run: echo hi
       - name: setup docker
         run: |
           sudo ./ci/github/helpers/setup_docker_compose.bash
