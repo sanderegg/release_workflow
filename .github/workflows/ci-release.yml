@@ -30,7 +30,7 @@ jobs:
           echo ::set-env name=TARGET::${target}
       - name: show env
         run: env
-      - if: env.TARGET == 'refs/remotes/origin/master'
+      - if: env.TARGET == 'remotes/origin/master'
         name: say hi
         run: echo hi
       - name: setup docker
