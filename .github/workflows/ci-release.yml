@@ -41,10 +41,10 @@ jobs:
       - if: env.TARGET == 'remotes/origin/master'
         env:
           FROM_TAG_PREFIX: staging-github
-        name: deploy
+        name: deploy from staging image
         run: ./ci/deploy/dockerhub-tag-version.bash
       - if: contains(env.TARGET, 'remotes/origin/hotfix_v')
         env:
           FROM_TAG_PREFIX: hotfix-github
-        name: deploy
+        name: deploy from hotfix image
         run: ./ci/deploy/dockerhub-tag-version.bash
