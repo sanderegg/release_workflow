@@ -28,7 +28,7 @@ jobs:
           echo ::set-env name=TARGET::${target}
       - name: show env
         run: env
-      - if: env.TARGET == master
+      - if: env.TARGET == 'master'
         name: say hi
         run: echo hi
       - name: setup docker
