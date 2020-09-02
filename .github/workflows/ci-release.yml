@@ -24,8 +24,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: set target variable
         run: |
-          target=$(git name-rev --refs="refs/heads/*" --name-only ${GITHUB_SHA})
-          echo ::set-env name=TARGET::${target}
+          echo ::set-env name=TARGET::=$(git name-rev --refs="refs/heads/*" --name-only ${GITHUB_SHA})
       - name: show env
         run: env
       - if: env.TARGET == 'master'
