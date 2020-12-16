@@ -14,3 +14,9 @@ jobs:
       - name: show host file
         run: |
           cat /etc/hosts
+      - name: cleanup host file
+        run: |
+          sudo sed -i "/127.0.0.1 registry/d" /etc/hosts
+      - name: show host file
+        run: |
+          cat /etc/hosts
