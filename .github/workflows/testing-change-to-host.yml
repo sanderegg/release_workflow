@@ -1,0 +1,16 @@
+name: change host files testing
+
+on:
+  push:
+
+jobs:
+  change-host_file:
+    runs-on: ubuntu-20.04
+    name: change the host file
+    steps:
+      - name: modify the host file manually
+        run: |
+          echo 127.0.0.1 registry >> /etc/hosts
+      - name: show host file
+        run: |
+          cat /etc/hosts
