@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: modify the host file manually
         run: |
-          echo 127.0.0.1 registry >> /etc/hosts
+          sudo echo 127.0.0.1 registry >> /etc/hosts
       - name: show host file
         run: |
           cat /etc/hosts
